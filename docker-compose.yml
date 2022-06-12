@@ -1,0 +1,38 @@
+---
+version: "3"
+services:
+  primary:
+    image: postgres:14-bullseye
+    container_name: primary
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./primary_postgres.conf:/etc/postgresql/postgresql.conf
+      - ./init_primary:/docker-entrypoint-initdb.d
+      - pg_primary_data:/var/lib/postgresql/data
+    restart: always
+    environment:
+     - TZ=Europe/Bucharest
+     - POSTGRES_DB=mydb
+     - POSTGRES_USER=postgres
+     - POSTGRES_PASSWORD=postgres
+
+  secondary:
+    image: postgres:14-bullseye
+    container_name: replica1
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./replica_postgres.conf:/etc/postgresql/postgresql.conf
+      - pg_replica1_data:/var/lib/postgresql/data
+    restart: always
+    environment:
+     - TZ=Europe/Bucharest
+     - POSTGRES_DB=mydb
+     - POSTGRES_USER=postgres
+     - POSTGRES_PASSWORD=postgres
+volumes:
+  pg_primary_data:
+    external: true
+  pg_replica1_data:
+    external: true
